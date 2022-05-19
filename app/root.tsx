@@ -1,5 +1,5 @@
 import type { LinksFunction } from "@remix-run/node";
-import { Links, LiveReload, Outlet } from "@remix-run/react";
+import { Links, LiveReload, Outlet, useCatch } from "@remix-run/react";
 
 import globalStylesUrl from "./styles/global.css";
 import globalMediumStylesUrl from "./styles/global-medium.css";
@@ -54,6 +54,22 @@ export default function App() {
   );
 }
 
+export function CatchBOundary() {
+  const caught = useCatch();
+
+  return (
+    <Document
+      title={`${caught.status} ${caught.statusText}`}
+    >
+      <div className="error-container">
+        <h1>
+          {caught.status} {caught.statusText}
+        </h1>
+      </div>
+    </Document>
+  );
+}
+
 export function ErrorBoundary({ error }: { error: Error; }) {
   return (
     <Document title="Uh-oh!">
@@ -64,3 +80,7 @@ export function ErrorBoundary({ error }: { error: Error; }) {
     </Document>
   );
 }
+
+/*
+  It might help to think of the unexpected errors as 500-level errors (server errors) and the expected errors as 400-level errors (client errors).
+*/
