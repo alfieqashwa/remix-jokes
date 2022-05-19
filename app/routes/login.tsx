@@ -8,7 +8,11 @@ import {
   from "@remix-run/react";
 
 import { db } from "~/utils/db.server";
-import { createUserSession, login } from "~/utils/session.server";
+import {
+  createUserSession,
+  login,
+  register
+} from "~/utils/session.server";
 import stylesUrl from "../styles/login.css";
 
 export const links: LinksFunction = () => {
@@ -97,7 +101,7 @@ export let action: ActionFunction = async ({ request }) => {
       return createUserSession(user.id, redirectTo);
     }
 
-    case "register":
+    case "register": {
       const userExists = await db.user.findFirst({
         where: { username },
       });
@@ -107,8 +111,20 @@ export let action: ActionFunction = async ({ request }) => {
           formError: `Use with username ${username} already exists`
         });
       };
-    // create the user
-    // create their session and redirect to `/jokes`
+
+      // create the user
+      const user = await register({ username, password });
+      if (!user) {
+        return badRequest({
+          fields,
+          formError: `Something went wrong trying to create a new user.`,
+        });
+      }
+
+      // create their session and redirect to `/jokes`
+      return createUserSession(user.id, redirectTo);
+    }
+
     default: {
       return badRequest({
         fields,
