@@ -1,26 +1,26 @@
-import type { LoaderFunction } from "@remix-run/node"
-import { json } from "@remix-run/node"
-import { useLoaderData, Link } from "@remix-run/react"
-import type { Joke } from "@prisma/client"
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData, Link } from "@remix-run/react";
+import type { Joke } from "@prisma/client";
 
-import { db } from "~/utils/db.server"
+import { db } from "~/utils/db.server";
 
-type LoaderData = { randomJoke: Joke }
+type LoaderData = { randomJoke: Joke; };
 
 export let loader: LoaderFunction = async ({ params }) => {
-  const count = await db.joke.count()
-  const randomRowNumber = Math.floor(Math.random() * count)
+  const count = await db.joke.count();
+  const randomRowNumber = Math.floor(Math.random() * count);
   const [randomJoke] = await db.joke.findMany({
     take: 1, skip: randomRowNumber
-  })
+  });
   // console.log("randomRowNumber -->", randomRowNumber);
   // console.log("randomJoke -->", [randomJoke]);
-  const data: LoaderData = { randomJoke }
-  return json(data)
-}
+  const data: LoaderData = { randomJoke };
+  return json(data);
+};
 
 export default function JokesIndexRoute() {
-  const data = useLoaderData<LoaderData>()
+  const data = useLoaderData<LoaderData>();
 
   return (
     <div>
@@ -28,5 +28,13 @@ export default function JokesIndexRoute() {
       <p>{data.randomJoke.content}</p>
       <Link to={data.randomJoke.id}>"{data.randomJoke.name}" Permalink</Link>
     </div>
-  )
+  );
+}
+
+export function ErrorBoundary() {
+  return (
+    <div className="error-container">
+      I did a whoopsies.
+    </div>
+  );
 }
